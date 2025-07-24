@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "navbar.html" %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-4">
+                    <h2 class="mb-4 text-center">Trading Setup</h2>
+                    <form>
+                        <div class="mb-3">
+                            <label for="indicator" class="form-label">Indicator</label>
+                            <select class="form-select" id="indicator" name="indicator" required>
+                                <option value="">Select Indicator</option>
+                                {% for indicator in indicators %}
+                                <option value="{{ indicator }}">{{ indicator }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="timeframe" class="form-label">Timeframe</label>
+                            <select class="form-select" id="timeframe" name="timeframe" required>
+                                <option value="">Select Timeframe</option>
+                                {% for tf in timeframes %}
+                                <option value="{{ tf }}">{{ tf }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="exchange" class="form-label">Exchange</label>
+                            <select class="form-select" id="exchange" name="exchange" required>
+                                <option value="">Select Exchange</option>
+                                {% for ex in exchanges %}
+                                <option value="{{ ex }}">{{ ex }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="type" class="form-label">Type</label>
+                            <select class="form-select" id="type" name="type" required>
+                                <option value="">Select Type</option>
+                                {% for t in types %}
+                                <option value="{{ t }}">{{ t }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="market" class="form-label">Market</label>
+                            <select class="form-select" id="market" name="market" required>
+                                <option value="">Select Market</option>
+                                {% for m in markets %}
+                                <option value="{{ m }}">{{ m }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Save Setup</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

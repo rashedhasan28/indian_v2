@@ -1,0 +1,212 @@
+{% comment %}Reusable sidebar/navbar for dashboard and other pages{% endcomment %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+<style>
+    .sidebar {
+        min-height: 100vh;
+        background: #fff;
+        box-shadow: 2px 0 16px 0 rgba(31, 38, 135, 0.10);
+        border-radius: 0 2rem 2rem 0;
+        padding: 2rem 1rem 1rem 1rem;
+        width: 220px;
+        transition: width 0.2s;
+    }
+    .sidebar .nav-link {
+        color: #1e3c72;
+        font-weight: 500;
+        border-radius: 0.5rem;
+        margin-bottom: 0.7rem;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        font-size: 1rem;
+        padding: 0.7rem 0.7rem;
+        transition: background 0.2s, color 0.2s, font-size 0.2s, padding 0.2s;
+    }
+    .sidebar .nav-link.active, .sidebar .nav-link:hover {
+        background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
+        color: #fff !important;
+    }
+    .sidebar .dropdown-toggle::after {
+        margin-left: auto;
+    }
+    @media (max-width: 991.98px) {
+        .sidebar {
+            display: none;
+            width: 180px !important;
+            padding: 1.2rem 0.5rem 0.5rem 0.5rem;
+        }
+        .offcanvas {
+            width: 80vw !important;
+            max-width: 320px !important;
+            border-radius: 0 !important;
+        }
+        .offcanvas .nav-link {
+            font-size: 0.95rem;
+            padding: 0.6rem 0.5rem;
+            gap: 0.7rem;
+        }
+    }
+    @media (max-width: 575.98px) {
+        .sidebar {
+            width: 100vw !important;
+            border-radius: 0;
+            padding: 1rem 0.2rem 0.2rem 0.2rem;
+        }
+        .offcanvas {
+            width: 90vw !important;
+            max-width: 320px !important;
+            border-radius: 0 !important;
+        }
+        .offcanvas .nav-link {
+            font-size: 0.9rem;
+            padding: 0.5rem 0.3rem;
+            gap: 0.5rem;
+        }
+    }
+    @media (min-width: 992px) {
+        .offcanvas {
+            display: none !important;
+        }
+        .sidebar {
+            display: block !important;
+            position: fixed;
+            width: 220px;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 1040;
+        }
+        .content {
+            margin-left: 240px;
+        }
+    }
+    .sidebar-toggle {
+        position: fixed;
+        top: 1rem;
+        left: 1rem;
+        z-index: 1050;
+        background: #fff;
+        border: none;
+        border-radius: 50%;
+        box-shadow: 0 2px 8px rgba(31, 38, 135, 0.10);
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    @media (min-width: 992px) {
+        .sidebar-toggle {
+            display: none;
+        }
+    }
+</style>
+<!-- Sidebar Toggle for Mobile -->
+<button class="sidebar-toggle d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar" aria-controls="offcanvasSidebar">
+    <i class="bi bi-list" style="font-size: 1.5rem;"></i>
+</button>
+<!-- Offcanvas Sidebar for Mobile -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasSidebar" aria-labelledby="offcanvasSidebarLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title fw-bold" id="offcanvasSidebarLabel">TradeDash</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body p-0">
+        <nav class="d-flex flex-column p-3">
+            <a class="nav-link" href="/dashboard/"><i class="bi bi-speedometer2"></i> Dashboard</a>
+            <a class="nav-link" href="#script-selection"><i class="bi bi-list-check"></i> Script Selection</a>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'trading_setup' %}">Trading Setup</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'order_execution_monitoring' %}">
+                    <i class="bi bi-graph-up-arrow"></i> Order Execution & Monitoring
+                </a>
+            </li>
+
+            <div class="dropdown mb-2">
+                <a class="nav-link dropdown-toggle" href="#trading-modes" id="tradingModesDropdownMobile" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-arrows-angle-expand"></i> Trading Modes
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="tradingModesDropdownMobile">
+                    <li><a class="dropdown-item" href="#paper-trading">Paper Trading</a></li>
+                    <li><a class="dropdown-item" href="#real-trading">Real Trading</a></li>
+                </ul>
+            </div>
+            <div class="dropdown mb-2">
+                <a class="nav-link dropdown-toggle" href="#indicator-settings" id="indicatorSettingsDropdownMobile" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-sliders"></i> Indicator Settings
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="indicatorSettingsDropdownMobile">
+                    <li><a class="dropdown-item" href="#rsi">Relative Strength Index (RSI)</a></li>
+                    <li><a class="dropdown-item" href="#macd">MACD</a></li>
+                    <li><a class="dropdown-item" href="#moving-average">Moving Average</a></li>
+                    <li><a class="dropdown-item" href="#vwap">VWAP</a></li>
+                    <li><a class="dropdown-item" href="#adx">ADX</a></li>
+                    <li><a class="dropdown-item" href="#supertrend">SuperTrend</a></li>
+                </ul>
+            </div>
+            <a class="nav-link" href="/brokerage-integration/"><i class="bi bi-link-45deg"></i> Broker Integration</a>
+            <a class="nav-link" href="#video-tutorials"><i class="bi bi-play-circle"></i> Video Tutorials</a>
+            <div class="dropdown mt-auto">
+                <a class="nav-link dropdown-toggle" href="#profile" id="profileDropdownMobile" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-person-circle"></i> Profile / Account
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="profileDropdownMobile">
+                    <li><a class="dropdown-item" href="#view-profile">View Profile</a></li>
+                    <li><a class="dropdown-item" href="#settings">Settings</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="#logout">Logout</a></li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+</div>
+<!-- Fixed Sidebar for Desktop -->
+<div class="sidebar d-none d-lg-flex flex-column p-4 position-fixed">
+    <a class="navbar-brand fw-bold mb-4" href="/dashboard/">TradeDash</a>
+    <a class="nav-link" href="/dashboard/"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <a class="nav-link" href="#script-selection"><i class="bi bi-list-check"></i> Script Selection</a>
+    <a class="nav-link" href="{% url 'trading_setup' %}">
+        <i class="bi bi-gear"></i> Trading Setup
+    </a>
+    <a class="nav-link" href="{% url 'order_execution_monitoring' %}">
+        <i class="bi bi-graph-up-arrow"></i> Order Execution & Monitoring
+    </a>
+    <div class="dropdown mb-2">
+        <a class="nav-link dropdown-toggle" href="#trading-modes" id="tradingModesDropdownDesktop" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-arrows-angle-expand"></i> Trading Modes
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="tradingModesDropdownDesktop">
+            <li><a class="dropdown-item" href="#paper-trading">Paper Trading</a></li>
+            <li><a class="dropdown-item" href="#real-trading">Real Trading</a></li>
+        </ul>
+    </div>
+    <div class="dropdown mb-2">
+        <a class="nav-link dropdown-toggle" href="#indicator-settings" id="indicatorSettingsDropdownDesktop" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-sliders"></i> Indicator Settings
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="indicatorSettingsDropdownDesktop">
+            <li><a class="dropdown-item" href="#rsi">Relative Strength Index (RSI)</a></li>
+            <li><a class="dropdown-item" href="#macd">MACD</a></li>
+            <li><a class="dropdown-item" href="#moving-average">Moving Average</a></li>
+            <li><a class="dropdown-item" href="#vwap">VWAP</a></li>
+            <li><a class="dropdown-item" href="#adx">ADX</a></li>
+            <li><a class="dropdown-item" href="#supertrend">SuperTrend</a></li>
+        </ul>
+    </div>
+    <a class="nav-link" href="/brokerage-integration/"><i class="bi bi-link-45deg"></i> Broker Integration</a>
+    <a class="nav-link" href="#video-tutorials"><i class="bi bi-play-circle"></i> Video Tutorials</a>
+    <div class="dropdown mt-auto">
+        <a class="nav-link dropdown-toggle" href="#profile" id="profileDropdownDesktop" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-person-circle"></i> Profile / Account
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="profileDropdownDesktop">
+            <li><a class="dropdown-item" href="#view-profile">View Profile</a></li>
+            <li><a class="dropdown-item" href="#settings">Settings</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="#logout">Logout</a></li>
+        </ul>
+    </div>
+</div> 

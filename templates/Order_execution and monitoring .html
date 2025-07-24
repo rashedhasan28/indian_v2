@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "navbar.html" %}
+<style>
+  html, body {
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+  }
+  .row, .container-fluid {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+  .card {
+    flex-wrap: wrap; /* allow wrapping inside card */
+  }
+</style>
+<div class="row justify-content-center mt-4">
+    {% for strategy in strategies %}
+    <div class="col-12 col-md-10 col-lg-8 mb-3 ">
+        <div class="card flex-row align-items-center shadow-sm p-3 h-100">
+            <div class="flex-grow-1">
+                <h5 class="mb-1">{{ strategy.name }}</h5>
+                <p class="mb-0 text-muted">Status: <span id="status-{{ strategy.id }}">{{ strategy.status }}</span></p>
+            </div>
+            <div>
+                <button class="btn btn-success me-2" onclick="startStrategy('{{ strategy.id }}')">Start</button>
+                <button class="btn btn-danger" onclick="stopStrategy('{{ strategy.id }}')">Stop</button>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info">No strategies available.</div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function startStrategy(id) {
+    document.getElementById('status-' + id).textContent = 'Running';
+}
+function stopStrategy(id) {
+    document.getElementById('status-' + id).textContent = 'Stopped';
+}
+</script>
+{% endblock %}

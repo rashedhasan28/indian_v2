@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}TradeDash{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: #fff;
+            min-height: 100vh;
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    {% block content %}{% endblock %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+
+<!-- Settings Modal (moved from dashboard.html) -->
+<div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="settingsModalLabel">Settings</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="settingsModalBody">
+        <!-- Settings content goes here -->
+        <p>Settings options will appear here.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Settings (Profile/Account)
+    var settingsLinks = document.querySelectorAll('a.dropdown-item[href="#settings"]');
+    settingsLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('settingsModalLabel').textContent = 'Settings';
+            document.getElementById('settingsModalBody').innerHTML = '<p>Settings options will appear here.</p>';
+            var modal = new bootstrap.Modal(document.getElementById('settingsModal'));
+            modal.show();
+        });
+    });
+
+    // Indicator Settings
+    const indicatorForms = {
+        rsi: {
+            title: 'RSI Settings',
+            form: `<form id='rsiForm'>
+                <div class='mb-3'>
+                    <label for='rsiPeriod' class='form-label'>Period</label>
+                    <input type='number' class='form-control' id='rsiPeriod' name='period' value='14' min='1' required>
+                </div>
+            </form>`
+        },
+        macd: {
+            title: 'MACD Settings',
+            form: `<form id='macdForm'>
+                <div class='mb-3'>
+                    <label for='macdFast' class='form-label'>Fast EMA</label>
+                    <input type='number' class='form-control' id='macdFast' name='fast' value='12' min='1' required>
+                </div>
+                <div class='mb-3'>
+                    <label for='macdSlow' class='form-label'>Slow EMA</label>
+                    <input type='number' class='form-control' id='macdSlow' name='slow' value='26' min='1' required>
+                </div>
+                <div class='mb-3'>
+                    <label for='macdSignal' class='form-label'>Signal EMA</label>
+                    <input type='number' class='form-control' id='macdSignal' name='signal' value='9' min='1' required>
+                </div>
+            </form>`
+        },
+        'moving-average': {
+            title: 'Moving Average Settings',
+            form: `<form id='maForm'>
+                <div class='mb-3'>
+                    <label for='maWindow' class='form-label'>Window</label>
+                    <input type='number' class='form-control' id='maWindow' name='window' value='20' min='1' required>
+                </div>
+            </form>`
+        },
+        vwap: {
+            title: 'VWAP Settings',
+            form: `<form id='vwapForm'>
+                <div class='mb-3'>
+                    <label class='form-label'>VWAP uses all available price and volume data.</label>
+                </div>
+            </form>`
+        },
+        adx: {
+            title: 'ADX Settings',
+            form: `<form id='adxForm'>
+                <div class='mb-3'>
+                    <label for='adxPeriod' class='form-label'>Period</label>
+                    <input type='number' class='form-control' id='adxPeriod' name='period' value='14' min='1' required>
+                </div>
+            </form>`
+        },
+        supertrend: {
+            title: 'SuperTrend Settings',
+            form: `<form id='supertrendForm'>
+                <div class='mb-3'>
+                    <label for='supertrendPeriod' class='form-label'>Period</label>
+                    <input type='number' class='form-control' id='supertrendPeriod' name='period' value='10' min='1' required>
+                </div>
+                <div class='mb-3'>
+                    <label for='supertrendMultiplier' class='form-label'>Multiplier</label>
+                    <input type='number' class='form-control' id='supertrendMultiplier' name='multiplier' value='3' min='0.1' step='0.1' required>
+                </div>
+            </form>`
+        }
+    };
+
+    // Listen for indicator dropdown clicks (mobile & desktop)
+    const indicatorSelectors = [
+        'a.dropdown-item[href="#rsi"]',
+        'a.dropdown-item[href="#macd"]',
+        'a.dropdown-item[href="#moving-average"]',
+        'a.dropdown-item[href="#vwap"]',
+        'a.dropdown-item[href="#adx"]',
+        'a.dropdown-item[href="#supertrend"]'
+    ];
+    indicatorSelectors.forEach(function(selector) {
+        document.querySelectorAll(selector).forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                // Extract key from href (e.g., #rsi -> rsi)
+                const href = link.getAttribute('href');
+                const key = href.replace('#', '');
+                if (indicatorForms[key]) {
+                    document.getElementById('settingsModalLabel').textContent = indicatorForms[key].title;
+                    document.getElementById('settingsModalBody').innerHTML = indicatorForms[key].form;
+                    var modal = new bootstrap.Modal(document.getElementById('settingsModal'));
+                    modal.show();
+                }
+            });
+        });
+    });
+});
+</script>
+</body>
+</html> 

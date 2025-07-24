@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "navbar.html" %}
+<div class="content flex-grow-1 p-4 d-flex align-items-center justify-content-center" style="min-height:100vh;">
+    <div class="integration-card mx-auto">
+        <h2 class="text-center mb-4">Brokerage Integration</h2>
+        <form id="brokerageForm" method="post" action="">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="brokerageSelect" class="form-label">Select Brokerage</label>
+                <select class="form-select" id="brokerageSelect" name="brokerage" required>
+                    <option value="">Select a brokerage</option>
+                    <option value="Upstock">Upstock</option>
+                    <option value="5paisa">5paisa</option>
+                    <option value="ICICI Direct">ICICI Direct</option>
+                    <option value="Religare">Religare</option>
+                    <option value="Shoonya">Shoonya</option>
+                    <option value="Angel One">Angel One</option>
+                    <option value="India Infoline">India Infoline</option>
+                    <option value="Kotak Securities">Kotak Securities</option>
+                    <option value="SMC">SMC</option>
+                    <option value="Motilal Oswal">Motilal Oswal</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="apiKey" class="form-label">API Key</label>
+                <input type="text" class="form-control" id="apiKey" name="api_key" required>
+            </div>
+            <div class="mb-3">
+                <label for="secretKey" class="form-label">Secret Key</label>
+                <input type="text" class="form-control" id="secretKey" name="secret_key" required>
+            </div>
+            <div class="mb-3">
+                <label for="startupUrl" class="form-label">Startup URL</label>
+                <input type="url" class="form-control" id="startupUrl" name="startup_url" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100" id="getCodeBtn">Get Code</button>
+            <button type="button" class="btn btn-success w-100 mt-2" id="submitCodeBtn" data-bs-toggle="modal" data-bs-target="#submitCodeModal">Submit Code</button>
+        </form>
+    </div>
+</div>
+<!-- Modal for submitting code -->
+<div class="modal fade" id="submitCodeModal" tabindex="-1" aria-labelledby="submitCodeModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="submitCodeModalLabel">Submit Upstox Code</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="get" action="/upstox-callback/">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="upstoxCode" class="form-label">Paste the code from Upstox URL</label>
+            <input type="text" class="form-control" id="upstoxCode" name="code" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-success">Submit Code</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+    document.getElementById('brokerageForm').addEventListener('submit', function(e) {
+        var brokerage = document.getElementById('brokerageSelect').value;
+        if (!brokerage) {
+            alert('Please select a brokerage.');
+            e.preventDefault();
+        }
+    });
+</script>
+{% endblock %} 

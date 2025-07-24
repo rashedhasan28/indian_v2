@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "navbar.html" %}
+<div class="content flex-grow-1 p-4">
+    <!-- Dashboard Summary Cards (Not Fixed) -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card shadow-sm border-0 text-center h-100 bg-dark text-white" style="border-radius:1rem;">
+                <div class="card-body">
+                    <div class="mb-2"><i class="bi bi-bar-chart-fill" style="font-size:2rem;color:#fff;"></i></div>
+                    <h6 class="card-title mb-1">Total Trade Execution</h6>
+                    <div class="fw-bold fs-4">0</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card shadow-sm border-0 text-center h-100 bg-dark text-white" style="border-radius:1rem;">
+                <div class="card-body">
+                    <div class="mb-2"><i class="bi bi-trophy-fill" style="font-size:2rem;color:#28a745;"></i></div>
+                    <h6 class="card-title mb-1">Total Win</h6>
+                    <div class="fw-bold fs-4">0</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card shadow-sm border-0 text-center h-100 bg-dark text-white" style="border-radius:1rem;">
+                <div class="card-body">
+                    <div class="mb-2"><i class="bi bi-x-circle-fill" style="font-size:2rem;color:#dc3545;"></i></div>
+                    <h6 class="card-title mb-1">Total Loss</h6>
+                    <div class="fw-bold fs-4">0</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card shadow-sm border-0 text-center h-100 bg-dark text-white" style="border-radius:1rem;">
+                <div class="card-body">
+                    <div class="mb-2"><i class="bi bi-activity" style="font-size:2rem;color:#ffc107;"></i></div>
+                    <h6 class="card-title mb-1">Running Trade</h6>
+                    <div class="fw-bold fs-4">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Dashboard Summary Cards -->
+    <!-- History Table Only -->
+    <div class="section-card p-4 mb-4">
+        <h5 class="mb-3">Trade History</h5>
+        <div class="table-responsive" style="height: 100%; max-height: 55vh; min-height: 250px; overflow: auto;">
+            <table class="table table-hover align-middle mb-0 w-100" style="min-width: 600px;">
+                <thead class="table-light sticky-top" style="position:sticky;top:0;z-index:2;">
+                    <tr>
+                        <th scope="col">Brokerage Name</th>
+                        <th scope="col">Trade Name</th>
+                        <th scope="col">Trade Amount</th>
+                        <th scope="col">Strategy</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Upstock</td>
+                        <td>RELIANCE</td>
+                        <td>₹10,000</td>
+                        <td>RSI Breakout</td>
+                    </tr>
+                    <tr>
+                        <td>5paisa</td>
+                        <td>TCS</td>
+                        <td>₹8,500</td>
+                        <td>MACD Crossover</td>
+                    </tr>
+                    <tr>
+                        <td>ICICI Direct</td>
+                        <td>INFY</td>
+                        <td>₹12,000</td>
+                        <td>VWAP Pullback</td>
+                    </tr>
+                    <tr>
+                        <td>Angel One</td>
+                        <td>HDFC Bank</td>
+                        <td>₹7,200</td>
+                        <td>Supertrend</td>
+                    </tr>
+                    <tr>
+                        <td>Kotak Securities</td>
+                        <td>SBIN</td>
+                        <td>₹9,300</td>
+                        <td>Bollinger Bands</td>
+                    </tr>
+                    <tr>
+                        <td>SMC</td>
+                        <td>ITC</td>
+                        <td>₹6,800</td>
+                        <td>Breakout</td>
+                    </tr>
+                    <tr>
+                        <td>Motilal Oswal</td>
+                        <td>MARUTI</td>
+                        <td>₹15,000</td>
+                        <td>Moving Average</td>
+                    </tr>
+                    <tr>
+                        <td>Religare</td>
+                        <td>AXISBANK</td>
+                        <td>₹11,500</td>
+                        <td>RSI Divergence</td>
+                    </tr>
+                    <tr>
+                        <td>Shoonya</td>
+                        <td>ADANIPORTS</td>
+                        <td>₹13,200</td>
+                        <td>MACD Histogram</td>
+                    </tr>
+                    <tr>
+                        <td>India Infoline</td>
+                        <td>BAJAJ-AUTO</td>
+                        <td>₹10,700</td>
+                        <td>Volume Spike</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- End History Table -->
+</div>
+{% endblock %}
+
+<!-- Settings Modal -->
+<div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="settingsModalLabel">Settings</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="settingsModalBody">
+        <!-- Settings content goes here -->
+        <p>Settings options will appear here.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% block extra_js %}
+<script>
+// Open settings modal when navbar 'Settings' is clicked
+// Both mobile and desktop
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Settings (Profile/Account)
+    var settingsLinks = document.querySelectorAll('a.dropdown-item[href="#settings"]');
+    settingsLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('settingsModalLabel').textContent = 'Settings';
+            document.getElementById('settingsModalBody').innerHTML = '<p>Settings options will appear here.</p>';
+            var modal = new bootstrap.Modal(document.getElementById('settingsModal'));
+            modal.show();
+        });
+    });
+
+    // Indicator Settings
+    const indicatorForms = {
+        rsi: {
+            title: 'RSI Settings',
+            form: `<form id='rsiForm'>
+                <div class='mb-3'>
+                    <label for='rsiPeriod' class='form-label'>Period</label>
+                    <input type='number' class='form-control' id='rsiPeriod' name='period' value='14' min='1' required>
+                </div>
+            </form>`
+        },
+        macd: {
+            title: 'MACD Settings',
+            form: `<form id='macdForm'>
+                <div class='mb-3'>
+                    <label for='macdFast' class='form-label'>Fast EMA</label>
+                    <input type='number' class='form-control' id='macdFast' name='fast' value='12' min='1' required>
+                </div>
+                <div class='mb-3'>
+                    <label for='macdSlow' class='form-label'>Slow EMA</label>
+                    <input type='number' class='form-control' id='macdSlow' name='slow' value='26' min='1' required>
+                </div>
+                <div class='mb-3'>
+                    <label for='macdSignal' class='form-label'>Signal EMA</label>
+                    <input type='number' class='form-control' id='macdSignal' name='signal' value='9' min='1' required>
+                </div>
+            </form>`
+        },
+        'moving-average': {
+            title: 'Moving Average Settings',
+            form: `<form id='maForm'>
+                <div class='mb-3'>
+                    <label for='maWindow' class='form-label'>Window</label>
+                    <input type='number' class='form-control' id='maWindow' name='window' value='20' min='1' required>
+                </div>
+            </form>`
+        },
+        vwap: {
+            title: 'VWAP Settings',
+            form: `<form id='vwapForm'>
+                <div class='mb-3'>
+                    <label class='form-label'>VWAP uses all available price and volume data.</label>
+                </div>
+            </form>`
+        },
+        adx: {
+            title: 'ADX Settings',
+            form: `<form id='adxForm'>
+                <div class='mb-3'>
+                    <label for='adxPeriod' class='form-label'>Period</label>
+                    <input type='number' class='form-control' id='adxPeriod' name='period' value='14' min='1' required>
+                </div>
+            </form>`
+        },
+        supertrend: {
+            title: 'SuperTrend Settings',
+            form: `<form id='supertrendForm'>
+                <div class='mb-3'>
+                    <label for='supertrendPeriod' class='form-label'>Period</label>
+                    <input type='number' class='form-control' id='supertrendPeriod' name='period' value='10' min='1' required>
+                </div>
+                <div class='mb-3'>
+                    <label for='supertrendMultiplier' class='form-label'>Multiplier</label>
+                    <input type='number' class='form-control' id='supertrendMultiplier' name='multiplier' value='3' min='0.1' step='0.1' required>
+                </div>
+            </form>`
+        }
+    };
+
+    // Listen for indicator dropdown clicks (mobile & desktop)
+    const indicatorSelectors = [
+        'a.dropdown-item[href="#rsi"]',
+        'a.dropdown-item[href="#macd"]',
+        'a.dropdown-item[href="#moving-average"]',
+        'a.dropdown-item[href="#vwap"]',
+        'a.dropdown-item[href="#adx"]',
+        'a.dropdown-item[href="#supertrend"]'
+    ];
+    indicatorSelectors.forEach(function(selector) {
+        document.querySelectorAll(selector).forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                // Extract key from href (e.g., #rsi -> rsi)
+                const href = link.getAttribute('href');
+                const key = href.replace('#', '');
+                if (indicatorForms[key]) {
+                    document.getElementById('settingsModalLabel').textContent = indicatorForms[key].title;
+                    document.getElementById('settingsModalBody').innerHTML = indicatorForms[key].form;
+                    var modal = new bootstrap.Modal(document.getElementById('settingsModal'));
+                    modal.show();
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %}
