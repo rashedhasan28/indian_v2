@@ -1,0 +1,36 @@
+# Core Django Framework
+Django==4.1.5
+
+# HTTP Requests and API Integration
+requests==2.31.0
+websocket-client==1.6.1
+
+# Data Analysis and Manipulation
+pandas==2.0.3
+numpy==1.24.3
+
+# Financial Data and Technical Analysis
+yfinance==0.2.18
+ta==0.10.2
+
+# Data Visualization
+plotly==5.15.0
+
+# Web Scraping and HTML Parsing
+beautifulsoup4==4.12.2
+
+# Environment Variables
+python-dotenv==1.0.0
+
+# Django UI Components
+django-crispy-forms==2.0
+crispy-bootstrap5==0.7
+
+# Additional Utilities
+python-dateutil==2.8.2
+pytz==2023.3
+
+# Development and Testing (Optional)
+# pytest==7.4.0
+# pytest-django==4.5.2
+# coverage==7.2.7 

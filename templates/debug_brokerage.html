@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "navbar.html" %}
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-lg border-0">
+                <div class="card-header">
+                    <h4><i class="bi bi-bug"></i> Brokerage Integration Debug</h4>
+                </div>
+                <div class="card-body">
+                    <h5>User Information</h5>
+                    <p><strong>Username:</strong> {{ user.username }}</p>
+                    <p><strong>Email:</strong> {{ user.email }}</p>
+                    <p><strong>User ID:</strong> {{ user.id }}</p>
+                    
+                    <hr>
+                    
+                    <h5>Brokerage Integrations</h5>
+                    {% if integrations %}
+                        {% for integration in integrations %}
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h6>Integration #{{ integration.id }}</h6>
+                                    <p><strong>Brokerage:</strong> {{ integration.brokerage }}</p>
+                                    <p><strong>API Key:</strong> {{ integration.api_key|slice:":10" }}...</p>
+                                    <p><strong>Secret Key:</strong> {{ integration.secret_key|slice:":10" }}...</p>
+                                    <p><strong>Startup URL:</strong> {{ integration.startup_url }}</p>
+                                    <p><strong>Is Active:</strong> {{ integration.is_active }}</p>
+                                    <p><strong>Access Token:</strong> {% if integration.access_token %}Yes{% else %}No{% endif %}</p>
+                                    <p><strong>Refresh Token:</strong> {% if integration.refresh_token %}Yes{% else %}No{% endif %}</p>
+                                    <p><strong>Created:</strong> {{ integration.timestamp }}</p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No brokerage integrations found.</p>
+                    {% endif %}
+                    
+                    <hr>
+                    
+                    <h5>Test Upstox Connection</h5>
+                    <form method="post" action="{% url 'debug_brokerage' %}">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">API Key</label>
+                                    <input type="text" class="form-control" name="test_api_key" placeholder="Enter API key to test">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Secret Key</label>
+                                    <input type="password" class="form-control" name="test_secret_key" placeholder="Enter secret key to test">
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Test Connection</button>
+                    </form>
+                    
+                    {% if test_result %}
+                        <div class="alert alert-info mt-3">
+                            <h6>Test Result:</h6>
+                            <pre>{{ test_result }}</pre>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %} 

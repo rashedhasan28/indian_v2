@@ -1,74 +1,216 @@
 {% extends "base.html" %}
 {% block content %}
 {% include "navbar.html" %}
-<div class="content flex-grow-1 p-4 d-flex align-items-center justify-content-center" style="min-height:100vh;">
-    <div class="integration-card mx-auto">
-        <h2 class="text-center mb-4">Brokerage Integration</h2>
-        <form id="brokerageForm" method="post" action="">
-            {% csrf_token %}
-            <div class="mb-3">
-                <label for="brokerageSelect" class="form-label">Select Brokerage</label>
-                <select class="form-select" id="brokerageSelect" name="brokerage" required>
-                    <option value="">Select a brokerage</option>
-                    <option value="Upstock">Upstock</option>
-                    <option value="5paisa">5paisa</option>
-                    <option value="ICICI Direct">ICICI Direct</option>
-                    <option value="Religare">Religare</option>
-                    <option value="Shoonya">Shoonya</option>
-                    <option value="Angel One">Angel One</option>
-                    <option value="India Infoline">India Infoline</option>
-                    <option value="Kotak Securities">Kotak Securities</option>
-                    <option value="SMC">SMC</option>
-                    <option value="Motilal Oswal">Motilal Oswal</option>
-                </select>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-link-45deg" style="font-size: 2rem; color: #1e3c72;"></i>
+                        <h2 class="mt-2">Brokerage Integration</h2>
+                        <p class="text-muted">Connect your trading account to start automated trading</p>
+                    </div>
+
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <!-- Current Integration Status -->
+                    {% if current_integration %}
+                        <div class="alert alert-info mb-4">
+                            <h6><i class="bi bi-check-circle"></i> Current Integration</h6>
+                            <p class="mb-1"><strong>Brokerage:</strong> {{ current_integration.brokerage }}</p>
+                            <p class="mb-1"><strong>Status:</strong> 
+                                {% if current_integration.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                {% else %}
+                                    <span class="badge bg-warning">Inactive</span>
+                                {% endif %}
+                            </p>
+                            {% if current_integration.access_token %}
+                                <p class="mb-0"><strong>Token:</strong> <span class="text-success">✓ Connected</span></p>
+                            {% else %}
+                                <p class="mb-0"><strong>Token:</strong> <span class="text-warning">⚠ Not Connected</span></p>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
+                    <form method="post" action="{% url 'brokerage_integration' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="brokerageSelect" class="form-label">
+                                <i class="bi bi-building"></i> Select Brokerage
+                            </label>
+                            <select class="form-select" id="brokerageSelect" name="brokerage" required>
+                                <option value="">Select a brokerage</option>
+                                <option value="Upstox" {% if current_integration.brokerage == 'Upstox' %}selected{% endif %}>Upstox</option>
+                                <option value="5paisa">5paisa</option>
+                                <option value="ICICI Direct">ICICI Direct</option>
+                                <option value="Religare">Religare</option>
+                                <option value="Shoonya">Shoonya</option>
+                                <option value="Angel One">Angel One</option>
+                                <option value="India Infoline">India Infoline</option>
+                                <option value="Kotak Securities">Kotak Securities</option>
+                                <option value="SMC">SMC</option>
+                                <option value="Motilal Oswal">Motilal Oswal</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="apiKey" class="form-label">
+                                <i class="bi bi-key"></i> API Key
+                            </label>
+                            <input type="text" class="form-control" id="apiKey" name="api_key" 
+                                   value="{{ current_integration.api_key|default:'' }}" required 
+                                   placeholder="Enter your API key">
+                        </div>
+                        <div class="mb-3">
+                            <label for="secretKey" class="form-label">
+                                <i class="bi bi-shield-lock"></i> Secret Key
+                            </label>
+                            <input type="password" class="form-control" id="secretKey" name="secret_key" 
+                                   value="{{ current_integration.secret_key|default:'' }}" required 
+                                   placeholder="Enter your secret key">
+                        </div>
+                        <div class="mb-3">
+                            <label for="startupUrl" class="form-label">
+                                <i class="bi bi-link"></i> Redirect URL
+                            </label>
+                            <input type="url" class="form-control" id="startupUrl" name="startup_url" 
+                                   value="{{ current_integration.startup_url|default:'http://127.0.0.1:8000/upstox-callback/' }}" required 
+                                   placeholder="http://127.0.0.1:8000/upstox-callback/">
+                            <small class="form-text text-muted">
+                                <strong>Important:</strong> This must match exactly what you configured in your Upstox app settings.
+                                <br>Common options: 
+                                <code>http://127.0.0.1:8000/upstox-callback/</code> or 
+                                <code>http://localhost:8000/upstox-callback/</code>
+                            </small>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 mb-2" id="getCodeBtn">
+                            <i class="bi bi-arrow-right-circle"></i> Connect Brokerage
+                        </button>
+                    </form>
+
+                    <!-- Manual Code Submission -->
+                    <div class="text-center mt-3">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#submitCodeModal">
+                            <i class="bi bi-code-slash"></i> Submit Authorization Code Manually
+                        </button>
+                    </div>
+                    
+                    <!-- Code Extractor -->
+                    <div class="text-center mt-2">
+                        <button type="button" class="btn btn-outline-info btn-sm" onclick="extractCodeFromUrl()">
+                            <i class="bi bi-link-45deg"></i> Extract Code from URL
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div class="mb-3">
-                <label for="apiKey" class="form-label">API Key</label>
-                <input type="text" class="form-control" id="apiKey" name="api_key" required>
+
+            <!-- Instructions Card -->
+            <div class="card shadow-sm border-0 mt-4">
+                <div class="card-body">
+                    <h6><i class="bi bi-info-circle"></i> How to Configure Upstox API</h6>
+                    <ol class="mb-0">
+                        <li>Go to <a href="https://developer.upstox.com/" target="_blank">Upstox Developer Portal</a></li>
+                        <li>Create a new application or edit existing one</li>
+                        <li>Get your API Key and Secret Key</li>
+                        <li><strong>Important:</strong> Set redirect URL to exactly: <code>http://127.0.0.1:8000/upstox-callback/</code></li>
+                        <li>Make sure the redirect URL matches what you enter above</li>
+                        <li>Enter credentials above and click "Connect Brokerage"</li>
+                    </ol>
+                    
+                    <div class="alert alert-warning mt-3">
+                        <h6><i class="bi bi-exclamation-triangle"></i> Troubleshooting</h6>
+                        <p class="mb-1"><strong>Error UDAPI100068:</strong> This means your redirect URL doesn't match Upstox app settings.</p>
+                        <p class="mb-0">Make sure the redirect URL in your Upstox app matches exactly what you enter above.</p>
+                    </div>
+                </div>
             </div>
-            <div class="mb-3">
-                <label for="secretKey" class="form-label">Secret Key</label>
-                <input type="text" class="form-control" id="secretKey" name="secret_key" required>
-            </div>
-            <div class="mb-3">
-                <label for="startupUrl" class="form-label">Startup URL</label>
-                <input type="url" class="form-control" id="startupUrl" name="startup_url" required>
-            </div>
-            <button type="submit" class="btn btn-primary w-100" id="getCodeBtn">Get Code</button>
-            <button type="button" class="btn btn-success w-100 mt-2" id="submitCodeBtn" data-bs-toggle="modal" data-bs-target="#submitCodeModal">Submit Code</button>
-        </form>
+        </div>
     </div>
 </div>
+
 <!-- Modal for submitting code -->
 <div class="modal fade" id="submitCodeModal" tabindex="-1" aria-labelledby="submitCodeModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="submitCodeModalLabel">Submit Upstox Code</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <form method="get" action="/upstox-callback/">
-        <div class="modal-body">
-          <div class="mb-3">
-            <label for="upstoxCode" class="form-label">Paste the code from Upstox URL</label>
-            <input type="text" class="form-control" id="upstoxCode" name="code" required>
-          </div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="submitCodeModalLabel">
+                    <i class="bi bi-code-slash"></i> Submit Upstox Authorization Code
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="get" action="{% url 'upstox_callback' %}">
+                <div class="modal-body">
+                    <p class="text-muted">If you received an authorization code from Upstox, paste it here:</p>
+                    <div class="mb-3">
+                        <label for="upstoxCode" class="form-label">Authorization Code</label>
+                        <input type="text" class="form-control" id="upstoxCode" name="code" required 
+                               placeholder="Paste the code from Upstox URL">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success">Submit Code</button>
+                </div>
+            </form>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-success">Submit Code</button>
-        </div>
-      </form>
     </div>
-  </div>
 </div>
+
+{% endblock %}
+
+{% block extra_js %}
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
     document.getElementById('brokerageForm').addEventListener('submit', function(e) {
         var brokerage = document.getElementById('brokerageSelect').value;
         if (!brokerage) {
             alert('Please select a brokerage.');
             e.preventDefault();
+            return;
+        }
+        
+        // Show loading state
+        var submitBtn = document.getElementById('getCodeBtn');
+        submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Connecting...';
+        submitBtn.disabled = true;
+    });
+
+    // Auto-fill redirect URL for Upstox
+    document.getElementById('brokerageSelect').addEventListener('change', function() {
+        if (this.value === 'Upstox') {
+            document.getElementById('startupUrl').value = 'http://127.0.0.1:8000/upstox-callback/';
         }
     });
+    
+    // Function to extract code from URL
+    window.extractCodeFromUrl = function() {
+        var url = prompt("Paste the URL you were redirected to (e.g., https://www.google.com/?code=abc123):");
+        if (url) {
+            try {
+                var urlObj = new URL(url);
+                var code = urlObj.searchParams.get('code');
+                if (code) {
+                    // Auto-submit the code
+                    document.getElementById('upstoxCode').value = code;
+                    document.getElementById('submitCodeModal').querySelector('form').submit();
+                } else {
+                    alert('No authorization code found in the URL. Please check the URL and try again.');
+                }
+            } catch (e) {
+                alert('Invalid URL. Please paste the complete URL you were redirected to.');
+            }
+        }
+    };
+});
 </script>
 {% endblock %} 

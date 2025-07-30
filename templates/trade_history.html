@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "navbar.html" %}
+
+<div class="container py-4">
+    <!-- Statistics Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 text-center h-100 bg-primary text-white">
+                <div class="card-body">
+                    <div class="mb-2"><i class="bi bi-bar-chart-fill" style="font-size:2rem;"></i></div>
+                    <h6 class="card-title mb-1">Total Trades</h6>
+                    <div class="fw-bold fs-4">{{ total_trades }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 text-center h-100 bg-success text-white">
+                <div class="card-body">
+                    <div class="mb-2"><i class="bi bi-currency-dollar" style="font-size:2rem;"></i></div>
+                    <h6 class="card-title mb-1">Total Volume</h6>
+                    <div class="fw-bold fs-4">₹{{ total_volume|floatformat:0 }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 text-center h-100 bg-info text-white">
+                <div class="card-body">
+                    <div class="mb-2"><i class="bi bi-check-circle-fill" style="font-size:2rem;"></i></div>
+                    <h6 class="card-title mb-1">Executed Trades</h6>
+                    <div class="fw-bold fs-4">{{ trades|length }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 text-center h-100 bg-warning text-white">
+                <div class="card-body">
+                    <div class="mb-2"><i class="bi bi-clock-fill" style="font-size:2rem;"></i></div>
+                    <h6 class="card-title mb-1">Pending Trades</h6>
+                    <div class="fw-bold fs-4">{{ trades|length }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trade History Table -->
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Trade History</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Symbol</th>
+                            <th>Type</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Total Amount</th>
+                            <th>Status</th>
+                            <th>Strategy</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for trade in trades %}
+                        <tr>
+                            <td>{{ trade.created_at|date:"M d, Y H:i" }}</td>
+                            <td>
+                                <strong>{{ trade.symbol }}</strong>
+                                {% if trade.setup %}
+                                <br><small class="text-muted">{{ trade.setup.exchange }}</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge {% if trade.trade_type == 'BUY' %}bg-success{% else %}bg-danger{% endif %}">
+                                    {{ trade.trade_type }}
+                                </span>
+                            </td>
+                            <td>{{ trade.quantity }}</td>
+                            <td>₹{{ trade.price }}</td>
+                            <td>₹{{ trade.total_amount }}</td>
+                            <td>
+                                <span class="badge 
+                                    {% if trade.status == 'EXECUTED' %}bg-success
+                                    {% elif trade.status == 'PENDING' %}bg-warning
+                                    {% elif trade.status == 'FAILED' %}bg-danger
+                                    {% else %}bg-secondary{% endif %}">
+                                    {{ trade.status }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if trade.setup %}
+                                <small>{{ trade.setup.name }}</small>
+                                {% else %}
+                                <small class="text-muted">Manual</small>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center py-4">
+                                <i class="bi bi-inbox" style="font-size: 2rem; color: #6c757d;"></i>
+                                <p class="mt-2 text-muted">No trades found</p>
+                                <p class="text-muted">Start trading to see your history here.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %} 

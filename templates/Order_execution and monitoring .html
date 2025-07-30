@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
 {% include "navbar.html" %}
+
+<!-- CSRF Token for AJAX requests -->
+{% csrf_token %}
+
 <style>
   html, body {
     overflow-x: hidden;
@@ -14,37 +18,1220 @@
   .card {
     flex-wrap: wrap; /* allow wrapping inside card */
   }
+
+  /* Bot Monitoring Styles - Inline for reliability */
+  .bot-monitoring-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    height: 80vh;
+    margin: 20px 0;
+  }
+
+  .strategies-panel {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    overflow-y: auto;
+  }
+
+  .logs-panel {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .logs-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f0f0f0;
+  }
+
+  .logs-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .logs-controls label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+    color: #666;
+  }
+
+  .logs-controls input[type="checkbox"] {
+    margin: 0;
+  }
+
+  .logs-controls button {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background-color 0.3s;
+  }
+
+  .refresh-btn {
+    background: #007bff;
+    color: white;
+  }
+
+  .refresh-btn:hover {
+    background: #0056b3;
+  }
+
+  .clear-btn {
+    background: #dc3545;
+    color: white;
+  }
+
+  .clear-btn:hover {
+    background: #c82333;
+  }
+
+  .log-count {
+    font-size: 14px;
+    color: #666;
+    font-weight: bold;
+  }
+
+  .bot-logs-container {
+    flex: 1;
+    overflow-y: auto;
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 10px;
+    border: 1px solid #e9ecef;
+  }
+
+  .log-entry {
+    background: white;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 8px;
+    border-left: 4px solid #dee2e6;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+  }
+
+  .log-entry:hover {
+    transform: translateX(2px);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  }
+
+  .log-entry.log-success {
+    border-left-color: #28a745;
+    background: linear-gradient(135deg, #f8fff9 0%, #ffffff 100%);
+  }
+
+  .log-entry.log-error {
+    border-left-color: #dc3545;
+    background: linear-gradient(135deg, #fff8f8 0%, #ffffff 100%);
+  }
+
+  .log-entry.log-warning {
+    border-left-color: #ffc107;
+    background: linear-gradient(135deg, #fffdf8 0%, #ffffff 100%);
+  }
+
+  .log-entry.log-info {
+    border-left-color: #17a2b8;
+    background: linear-gradient(135deg, #f8fdff 0%, #ffffff 100%);
+  }
+
+  .log-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+
+  .log-icon {
+    font-size: 16px;
+  }
+
+  .log-type {
+    background: #e9ecef;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #495057;
+  }
+
+  .log-time {
+    font-size: 12px;
+    color: #6c757d;
+    margin-left: auto;
+  }
+
+  .log-strategy {
+    background: #007bff;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: bold;
+  }
+
+  .log-message {
+    font-size: 14px;
+    color: #212529;
+    line-height: 1.4;
+    margin-bottom: 8px;
+  }
+
+  .log-details {
+    background: #f8f9fa;
+    border-radius: 4px;
+    padding: 8px;
+    font-size: 12px;
+    color: #6c757d;
+    border: 1px solid #e9ecef;
+  }
+
+  .details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 4px;
+  }
+
+  .detail-item {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .detail-item strong {
+    color: #495057;
+  }
+
+  .strategy-card {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+  }
+
+  .strategy-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+  }
+
+  /* Real-time Data Styles */
+  .realtime-data {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 10px 0;
+    border-left: 4px solid #007bff;
+  }
+
+  .realtime-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+
+  .realtime-indicator {
+    font-weight: 600;
+    color: #007bff;
+  }
+
+  .realtime-timestamp {
+    font-size: 12px;
+    color: #6c757d;
+  }
+
+  .realtime-metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .metric {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+  }
+
+  .metric-label {
+    font-size: 13px;
+    color: #495057;
+    font-weight: 500;
+  }
+
+  .metric-value {
+    font-size: 13px;
+    font-weight: 600;
+    color: #212529;
+  }
+
+  .metric-value.buy {
+    color: #28a745;
+  }
+
+  .metric-value.sell {
+    color: #dc3545;
+  }
+
+  .metric-value.hold {
+    color: #ffc107;
+  }
+
+  .last-log {
+    font-size: 12px;
+    color: #6c757d;
+    border-top: 1px solid #dee2e6;
+    padding-top: 8px;
+  }
+
+  .last-log .log-message {
+    font-weight: 500;
+  }
+
+  .last-log .log-time {
+    color: #adb5bd;
+  }
+
+  .strategy-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .strategy-name {
+    font-weight: bold;
+    color: #212529;
+    font-size: 16px;
+  }
+
+  .strategy-status {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+
+  .strategy-status.running {
+    background: #d4edda;
+    color: #155724;
+  }
+
+  .strategy-status.stopped {
+    background: #f8d7da;
+    color: #721c24;
+  }
+
+  .strategy-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 8px;
+    margin-bottom: 15px;
+  }
+
+  .strategy-detail {
+    font-size: 12px;
+    color: #6c757d;
+  }
+
+  .strategy-detail strong {
+    color: #495057;
+  }
+
+  .strategy-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .strategy-actions button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.3s;
+  }
+
+  .start-btn {
+    background: #28a745;
+    color: white;
+  }
+
+  .start-btn:hover {
+    background: #218838;
+  }
+
+  .stop-btn {
+    background: #dc3545;
+    color: white;
+  }
+
+  .stop-btn:hover {
+    background: #c82333;
+  }
+
+  .edit-btn {
+    background: #17a2b8;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    margin: 2px;
+  }
+  
+  .edit-btn:hover {
+    background: #138496;
+  }
+
+  .delete-btn {
+    background: #6c757d;
+    color: white;
+  }
+
+  .delete-btn:hover {
+    background: #5a6268;
+  }
+
+  .loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .bot-monitoring-container {
+      grid-template-columns: 1fr;
+      height: auto;
+    }
+    
+    .strategies-panel,
+    .logs-panel {
+      height: 50vh;
+    }
+    
+    .logs-header {
+      flex-direction: column;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    
+    .logs-controls {
+      width: 100%;
+      justify-content: space-between;
+    }
+    
+    /* Strategy creation form responsive */
+    .row .col-md-2,
+    .row .col-md-3 {
+      margin-bottom: 15px;
+    }
+    
+    .form-text {
+      font-size: 12px;
+    }
+  }
 </style>
-<div class="row justify-content-center mt-4">
-    {% for strategy in strategies %}
-    <div class="col-12 col-md-10 col-lg-8 mb-3 ">
-        <div class="card flex-row align-items-center shadow-sm p-3 h-100">
-            <div class="flex-grow-1">
-                <h5 class="mb-1">{{ strategy.name }}</h5>
-                <p class="mb-0 text-muted">Status: <span id="status-{{ strategy.id }}">{{ strategy.status }}</span></p>
-            </div>
-            <div>
-                <button class="btn btn-success me-2" onclick="startStrategy('{{ strategy.id }}')">Start</button>
-                <button class="btn btn-danger" onclick="stopStrategy('{{ strategy.id }}')">Stop</button>
+
+<div class="container py-4">
+    <!-- Create Strategy Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Create New Strategy</h5>
+                    <form method="post" action="{% url 'create_strategy' %}">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label for="strategy_name" class="form-label">Strategy Name</label>
+                                <input type="text" class="form-control" id="strategy_name" name="name" required placeholder="e.g., RSI Breakout Strategy">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="setup_id" class="form-label">Trading Setup</label>
+                                <select class="form-select" id="setup_id" name="setup_id" required>
+                                    <option value="">Select Trading Setup</option>
+                                    {% for setup in user_setups %}
+                                    <option value="{{ setup.id }}">{{ setup.name }} ({{ setup.symbol }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="take_profit" class="form-label">Take Profit (%)</label>
+                                <input type="number" class="form-control" id="take_profit" name="take_profit" step="0.01" min="0" max="100" placeholder="5.00">
+                                <div class="form-text">
+                                    <small class="text-muted">e.g., 5.00 for 5%</small>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="stop_loss" class="form-label">Stop Loss (%)</label>
+                                <input type="number" class="form-control" id="stop_loss" name="stop_loss" step="0.01" min="0" max="100" placeholder="2.00">
+                                <div class="form-text">
+                                    <small class="text-muted">e.g., 2.00 for 2%</small>
+                                </div>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary">Create Strategy</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-    {% empty %}
-    <div class="col-12">
-        <div class="alert alert-info">No strategies available.</div>
+
+    <!-- Bot Monitoring Container -->
+    <div class="bot-monitoring-container">
+        <!-- Left Panel: Strategies -->
+        <div class="strategies-panel">
+            <h4 class="mb-3">📊 Your Strategies</h4>
+            
+            {% for strategy in strategies %}
+            <div class="strategy-card" data-strategy-id="{{ strategy.id }}">
+                <div class="strategy-header">
+                    <div class="strategy-name">{{ strategy.name }}</div>
+                    <div class="strategy-status {% if strategy.status == 'RUNNING' %}running{% else %}stopped{% endif %}" id="status-{{ strategy.id }}">
+                        {{ strategy.status }}
+                    </div>
+                </div>
+                
+                <div class="strategy-details">
+                    <div class="strategy-detail">
+                        <strong>Symbol:</strong> {{ strategy.setup.symbol }}
+                    </div>
+                    <div class="strategy-detail">
+                        <strong>Indicator:</strong> {{ strategy.setup.indicator }}
+                    </div>
+                    <div class="strategy-detail">
+                        <strong>Timeframe:</strong> {{ strategy.setup.timeframe }}
+                    </div>
+                    <div class="strategy-detail">
+                        <strong>Quantity:</strong> {{ strategy.setup.quantity }}
+                    </div>
+                    <div class="strategy-detail">
+                        <strong>Trade Direction:</strong> 
+                        <span class="badge bg-primary">{{ strategy.setup.get_trade_direction_display }}</span>
+                    </div>
+                    {% if strategy.take_profit_percentage or strategy.stop_loss_percentage %}
+                    <div class="strategy-detail">
+                        <strong>Risk Management:</strong>
+                        {% if strategy.take_profit_percentage %}
+                            <span class="badge bg-success me-1">TP: {{ strategy.take_profit_percentage }}%</span>
+                        {% endif %}
+                        {% if strategy.stop_loss_percentage %}
+                            <span class="badge bg-danger">SL: {{ strategy.stop_loss_percentage }}%</span>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Real-time Data Section -->
+                <div class="realtime-data" id="realtime-{{ strategy.id }}">
+                    <div class="realtime-header">
+                        <span class="realtime-indicator">📊 Live Data</span>
+                        <span class="realtime-timestamp" id="timestamp-{{ strategy.id }}">Loading...</span>
+                    </div>
+                    
+                    <div class="realtime-metrics">
+                        <div class="metric">
+                            <span class="metric-label">Current Price:</span>
+                            <span class="metric-value" id="price-{{ strategy.id }}">--</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">{{ strategy.setup.indicator }}:</span>
+                            <span class="metric-value" id="indicator-{{ strategy.id }}">--</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Signal:</span>
+                            <span class="metric-value" id="signal-{{ strategy.id }}">--</span>
+                        </div>
+                    </div>
+                    
+                    <div class="last-log" id="lastlog-{{ strategy.id }}">
+                        <small class="text-muted">No recent activity</small>
+                    </div>
+                </div>
+                
+                {% if strategy.last_signal %}
+                <div class="strategy-detail mb-2">
+                    <strong>Last Signal:</strong> 
+                    <span class="badge {% if strategy.last_signal == 'buy' %}bg-success{% elif strategy.last_signal == 'sell' %}bg-danger{% else %}bg-warning{% endif %}">
+                        {{ strategy.last_signal|upper }}
+                    </span>
+                </div>
+                {% endif %}
+                
+                {% if strategy.last_check %}
+                <div class="strategy-detail mb-2">
+                    <strong>Last Check:</strong> {{ strategy.last_check|date:"M d, Y H:i" }}
+                </div>
+                {% endif %}
+                
+                <div class="strategy-actions">
+                    <form method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="strategy_id" value="{{ strategy.id }}">
+                        {% if strategy.status == 'STOPPED' %}
+                        <button type="submit" name="action" value="start" class="start-btn">🚀 Start</button>
+                        {% else %}
+                        <button type="submit" name="action" value="stop" class="stop-btn">⏹️ Stop</button>
+                        {% endif %}
+                        <button type="button" class="edit-btn" onclick="editStrategy({{ strategy.id }}, '{{ strategy.name }}', {{ strategy.take_profit_percentage|default:'null' }}, {{ strategy.stop_loss_percentage|default:'null' }})">✏️ Edit</button>
+                        <button type="submit" name="action" value="delete" class="delete-btn" onclick="return confirm('Are you sure you want to delete this strategy?')">🗑️ Delete</button>
+                    </form>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center py-5">
+                <i class="bi bi-robot" style="font-size: 3rem; color: #6c757d;"></i>
+                <h5 class="mt-3 text-muted">No strategies available</h5>
+                <p class="text-muted">Create your first trading strategy to get started with automated trading.</p>
+                <a href="{% url 'trading_setup' %}" class="btn btn-primary">Create Trading Setup</a>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Right Panel: Real-Time Logs -->
+        <div class="logs-panel">
+            <div class="logs-header">
+                <h4 class="mb-0">📋 Real-Time Bot Logs</h4>
+                <div class="logs-controls">
+                    <label>
+                        <input type="checkbox" id="auto-refresh-toggle" checked>
+                        Auto-refresh
+                    </label>
+                    <button id="refresh-logs-btn" class="refresh-btn">🔄 Refresh</button>
+                    <button id="clear-logs-btn" class="clear-btn">🗑️ Clear All</button>
+                    <span class="log-count">Logs: <span id="log-count">0</span></span>
+                </div>
+            </div>
+            
+            <div id="bot-logs-container" class="bot-logs-container">
+                <!-- Logs will be loaded here by JavaScript -->
+                <div class="text-center py-4">
+                    <div class="loading"></div>
+                    <p class="mt-2 text-muted">Loading bot logs...</p>
+                </div>
+            </div>
+        </div>
     </div>
-    {% endfor %}
 </div>
 
 {% endblock %}
 
 {% block extra_js %}
 <script>
-function startStrategy(id) {
-    document.getElementById('status-' + id).textContent = 'Running';
+// Bot Monitoring JavaScript - Inline for reliability
+class BotMonitor {
+    constructor() {
+        this.logContainer = document.getElementById('bot-logs-container');
+        this.logCount = document.getElementById('log-count');
+        this.lastLogId = 0;
+        this.autoRefresh = true;
+        this.refreshInterval = 5000; // 5 seconds
+        
+        this.init();
+    }
+    
+    init() {
+        // Load initial logs
+        this.loadLogs();
+        
+        // Set up auto-refresh
+        setInterval(() => {
+            if (this.autoRefresh) {
+                this.loadLogs();
+            }
+        }, this.refreshInterval);
+        
+        // Add event listeners
+        this.addEventListeners();
+    }
+    
+    addEventListeners() {
+        // Auto-refresh toggle
+        const autoRefreshToggle = document.getElementById('auto-refresh-toggle');
+        if (autoRefreshToggle) {
+            autoRefreshToggle.addEventListener('change', (e) => {
+                this.autoRefresh = e.target.checked;
+                if (this.autoRefresh) {
+                    this.showNotification('Auto-refresh enabled', 'info');
+                } else {
+                    this.showNotification('Auto-refresh disabled', 'info');
+                }
+            });
+        }
+        
+        // Clear logs button
+        const clearLogsBtn = document.getElementById('clear-logs-btn');
+        if (clearLogsBtn) {
+            clearLogsBtn.addEventListener('click', () => {
+                this.clearLogs();
+            });
+        }
+        
+        // Manual refresh button
+        const refreshBtn = document.getElementById('refresh-logs-btn');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => {
+                this.loadLogs();
+            });
+        }
+    }
+    
+    async loadLogs() {
+        try {
+            const response = await fetch('/api/bot-logs/');
+            const data = await response.json();
+            
+            if (data.success) {
+                this.updateLogsDisplay(data.logs);
+                this.updateLogCount(data.total_logs);
+            } else {
+                console.error('Failed to load logs:', data.error);
+                this.showError('Failed to load logs: ' + data.error);
+            }
+        } catch (error) {
+            console.error('Error loading logs:', error);
+            this.showError('Error loading logs: ' + error.message);
+        }
+    }
+    
+    updateLogsDisplay(logs) {
+        if (!this.logContainer) return;
+        
+        if (logs.length === 0) {
+            this.logContainer.innerHTML = `
+                <div class="text-center py-4">
+                    <p class="text-muted">No logs available yet.</p>
+                    <p class="text-muted">Start a strategy and run the bot to see activity logs.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        let html = '';
+        
+        logs.forEach(log => {
+            const logClass = this.getLogClass(log.log_type);
+            const icon = this.getLogIcon(log.log_type);
+            const timestamp = this.formatTimestamp(log.timestamp);
+            
+            html += `
+                <div class="log-entry ${logClass}" data-log-id="${log.id}">
+                    <div class="log-header">
+                        <span class="log-icon">${icon}</span>
+                        <span class="log-type">${this.formatLogType(log.log_type)}</span>
+                        <span class="log-time">${timestamp}</span>
+                        ${log.strategy_name ? `<span class="log-strategy">${log.strategy_name}</span>` : ''}
+                    </div>
+                    <div class="log-message">${log.message}</div>
+                    ${log.details ? `<div class="log-details">${this.formatDetails(log.details)}</div>` : ''}
+                </div>
+            `;
+        });
+        
+        this.logContainer.innerHTML = html;
+        
+        // Scroll to bottom if new logs
+        if (logs.length > 0 && logs[0].id > this.lastLogId) {
+            this.logContainer.scrollTop = this.logContainer.scrollHeight;
+            this.lastLogId = logs[0].id;
+        }
+    }
+    
+    getLogClass(logType) {
+        const classes = {
+            'DATA_FETCH': 'log-info',
+            'INDICATOR_CALC': 'log-info',
+            'SIGNAL_GENERATED': 'log-success',
+            'TRADE_EXECUTED': 'log-success',
+            'TRADE_FAILED': 'log-error',
+            'STRATEGY_START': 'log-success',
+            'STRATEGY_STOP': 'log-warning',
+            'ERROR': 'log-error',
+            'INFO': 'log-info'
+        };
+        return classes[logType] || 'log-info';
+    }
+    
+    getLogIcon(logType) {
+        const icons = {
+            'DATA_FETCH': '📊',
+            'INDICATOR_CALC': '📈',
+            'SIGNAL_GENERATED': '🎯',
+            'TRADE_EXECUTED': '✅',
+            'TRADE_FAILED': '❌',
+            'STRATEGY_START': '🚀',
+            'STRATEGY_STOP': '⏹️',
+            'ERROR': '⚠️',
+            'INFO': 'ℹ️'
+        };
+        return icons[logType] || 'ℹ️';
+    }
+    
+    formatLogType(logType) {
+        return logType.replace('_', ' ').toLowerCase();
+    }
+    
+    formatTimestamp(timestamp) {
+        const date = new Date(timestamp);
+        return date.toLocaleString();
+    }
+    
+    formatDetails(details) {
+        if (typeof details === 'object') {
+            let html = '<div class="details-grid">';
+            for (const [key, value] of Object.entries(details)) {
+                if (key !== 'error') { // Don't show error details in main view
+                    html += `<div class="detail-item"><strong>${key}:</strong> ${value}</div>`;
+                }
+            }
+            html += '</div>';
+            return html;
+        }
+        return details;
+    }
+    
+    updateLogCount(count) {
+        if (this.logCount) {
+            this.logCount.textContent = count;
+        }
+    }
+    
+    async clearLogs() {
+        if (!confirm('Are you sure you want to clear ALL logs? This action cannot be undone.')) {
+            return;
+        }
+        
+        const requestData = { clear_all: true };
+        const csrfToken = this.getCSRFToken();
+        
+        console.log('DEBUG: Sending clear logs request with data:', requestData);
+        console.log('DEBUG: CSRF Token:', csrfToken ? 'Found' : 'Not found');
+        
+        try {
+            const response = await fetch('/api/clear-logs/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            });
+            
+            console.log('DEBUG: Response status:', response.status);
+            console.log('DEBUG: Response headers:', response.headers);
+            
+            if (response.status === 403) {
+                this.showNotification('Access denied. Please refresh the page and try again.', 'error');
+                return;
+            }
+            
+            if (response.status === 302) {
+                this.showNotification('Session expired. Please login again.', 'error');
+                return;
+            }
+            
+            const data = await response.json();
+            console.log('DEBUG: Response data:', data);
+            
+            if (data.success) {
+                this.showNotification('All logs cleared successfully', 'success');
+                this.loadLogs(); // Reload logs
+            } else {
+                this.showNotification('Failed to clear logs: ' + data.error, 'error');
+            }
+        } catch (error) {
+            console.error('Error clearing logs:', error);
+            this.showNotification('Error clearing logs: ' + error.message, 'error');
+        }
+    }
 }
-function stopStrategy(id) {
-    document.getElementById('status-' + id).textContent = 'Stopped';
+
+// Strategy Real-time Data Manager
+class StrategyDataManager {
+    constructor() {
+        this.strategies = [];
+        this.updateInterval = null;
+        this.init();
+    }
+    
+    init() {
+        // Get all strategy cards
+        const strategyCards = document.querySelectorAll('.strategy-card');
+        strategyCards.forEach(card => {
+            const strategyId = card.dataset.strategyId;
+            if (strategyId) {
+                this.strategies.push(strategyId);
+            }
+        });
+        
+        // Start updating data
+        this.startUpdates();
+    }
+    
+    startUpdates() {
+        // Update immediately
+        this.updateAllStrategies();
+        
+        // Update every 10 seconds
+        this.updateInterval = setInterval(() => {
+            this.updateAllStrategies();
+        }, 10000);
+    }
+    
+    stopUpdates() {
+        if (this.updateInterval) {
+            clearInterval(this.updateInterval);
+            this.updateInterval = null;
+        }
+    }
+    
+    async updateAllStrategies() {
+        for (const strategyId of this.strategies) {
+            await this.updateStrategyData(strategyId);
+        }
+    }
+    
+    async updateStrategyData(strategyId) {
+        try {
+            const response = await fetch('/api/strategy-data/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': this.getCSRFToken(),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ strategy_id: strategyId })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                this.updateStrategyUI(strategyId, data.data);
+            } else {
+                console.error('Failed to get strategy data:', data.error);
+                this.showError(strategyId, data.error);
+            }
+        } catch (error) {
+            console.error('Error updating strategy data:', error);
+            this.showError(strategyId, 'Network error');
+        }
+    }
+    
+    updateStrategyUI(strategyId, data) {
+        // Update price
+        const priceElement = document.getElementById(`price-${strategyId}`);
+        if (priceElement) {
+            priceElement.textContent = `₹${data.current_price.toFixed(2)}`;
+        }
+        
+        // Update indicator value
+        const indicatorElement = document.getElementById(`indicator-${strategyId}`);
+        if (indicatorElement && data.indicator_value !== null) {
+            indicatorElement.textContent = data.indicator_value;
+        }
+        
+        // Update signal
+        const signalElement = document.getElementById(`signal-${strategyId}`);
+        if (signalElement && data.indicator_signal) {
+            signalElement.textContent = data.indicator_signal.toUpperCase();
+            signalElement.className = `metric-value ${data.indicator_signal}`;
+        }
+        
+        // Update timestamp
+        const timestampElement = document.getElementById(`timestamp-${strategyId}`);
+        if (timestampElement) {
+            const date = new Date(data.timestamp);
+            timestampElement.textContent = date.toLocaleTimeString();
+        }
+        
+        // Update last log
+        const lastLogElement = document.getElementById(`lastlog-${strategyId}`);
+        if (lastLogElement && data.last_log) {
+            const logTime = new Date(data.last_log.timestamp).toLocaleTimeString();
+            lastLogElement.innerHTML = `
+                <div class="log-message">${data.last_log.message}</div>
+                <div class="log-time">${logTime}</div>
+            `;
+        }
+        
+        // Update status if changed
+        const statusElement = document.getElementById(`status-${strategyId}`);
+        if (statusElement && statusElement.textContent !== data.status) {
+            statusElement.textContent = data.status;
+            statusElement.className = `strategy-status ${data.status === 'RUNNING' ? 'running' : 'stopped'}`;
+        }
+    }
+    
+    showError(strategyId, error) {
+        const priceElement = document.getElementById(`price-${strategyId}`);
+        if (priceElement) {
+            priceElement.textContent = 'Error';
+            priceElement.style.color = '#dc3545';
+        }
+    }
+    
+    getCSRFToken() {
+        const token = document.querySelector('[name=csrfmiddlewaretoken]');
+        if (!token) {
+            console.warn('CSRF token not found. AJAX requests may fail.');
+            return '';
+        }
+        return token.value;
+    }
+    
+    showNotification(message, type = 'info') {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 6px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideIn 0.3s ease;
+        `;
+        
+        const bgColor = type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#17a2b8';
+        notification.style.background = bgColor;
+        
+        notification.innerHTML = `
+            <span>${message}</span>
+            <button onclick="this.parentElement.remove()" style="background: none; border: none; color: white; font-size: 18px; cursor: pointer; padding: 0; margin-left: 10px;">×</button>
+        `;
+        
+        // Add to page
+        document.body.appendChild(notification);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.remove();
+            }
+        }, 3000);
+    }
+    
+    showError(message) {
+        this.showNotification(message, 'error');
+    }
+}
+
+// Initialize bot monitor when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    if (document.getElementById('bot-logs-container')) {
+        window.botMonitor = new BotMonitor();
+    }
+    
+    // Initialize strategy data manager
+    if (document.querySelector('.strategy-card')) {
+        window.strategyDataManager = new StrategyDataManager();
+    }
+});
+
+// Auto-refresh status every 30 seconds
+setInterval(function() {
+    // You can add AJAX calls here to refresh strategy status
+    // For now, we'll just reload the page
+    // location.reload();
+}, 30000);
+
+// Add some interactive features
+document.addEventListener('DOMContentLoaded', function() {
+    // Add hover effects to strategy cards
+    const strategyCards = document.querySelectorAll('.strategy-card');
+    strategyCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.transition = 'transform 0.2s ease';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+});
+
+// Strategy editing functionality
+function editStrategy(strategyId, strategyName, currentTakeProfit, currentStopLoss) {
+    // Create modal
+    const modal = document.createElement('div');
+    modal.className = 'modal fade';
+    modal.id = 'editStrategyModal';
+    modal.setAttribute('tabindex', '-1');
+    modal.setAttribute('aria-labelledby', 'editStrategyModalLabel');
+    modal.setAttribute('aria-hidden', 'true');
+    
+    modal.innerHTML = `
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editStrategyModalLabel">Edit Strategy: ${strategyName}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editStrategyForm">
+                        <div class="mb-3">
+                            <label for="edit_take_profit" class="form-label">Take Profit (%)</label>
+                            <input type="number" class="form-control" id="edit_take_profit" name="take_profit" 
+                                   step="0.01" min="0" max="100" 
+                                   value="${currentTakeProfit !== null ? currentTakeProfit : ''}" 
+                                   placeholder="5.00">
+                            <div class="form-text">
+                                <small class="text-muted">e.g., 5.00 for 5% (leave empty to remove)</small>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_stop_loss" class="form-label">Stop Loss (%)</label>
+                            <input type="number" class="form-control" id="edit_stop_loss" name="stop_loss" 
+                                   step="0.01" min="0" max="100" 
+                                   value="${currentStopLoss !== null ? currentStopLoss : ''}" 
+                                   placeholder="2.00">
+                            <div class="form-text">
+                                <small class="text-muted">e.g., 2.00 for 2% (leave empty to remove)</small>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveStrategyChanges(${strategyId})">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Add modal to page
+    document.body.appendChild(modal);
+    
+    // Show modal
+    const bootstrapModal = new bootstrap.Modal(modal);
+    bootstrapModal.show();
+    
+    // Remove modal from DOM when hidden
+    modal.addEventListener('hidden.bs.modal', function() {
+        modal.remove();
+    });
+}
+
+function saveStrategyChanges(strategyId) {
+    const takeProfit = document.getElementById('edit_take_profit').value;
+    const stopLoss = document.getElementById('edit_stop_loss').value;
+    
+    // Validate inputs
+    if (takeProfit && (isNaN(takeProfit) || takeProfit < 0 || takeProfit > 100)) {
+        showNotification('Invalid take profit percentage. Please enter a value between 0 and 100.', 'error');
+        return;
+    }
+    
+    if (stopLoss && (isNaN(stopLoss) || stopLoss < 0 || stopLoss > 100)) {
+        showNotification('Invalid stop loss percentage. Please enter a value between 0 and 100.', 'error');
+        return;
+    }
+    
+    // Send AJAX request
+    fetch('/update-strategy/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+            strategy_id: strategyId,
+            take_profit: takeProfit || null,
+            stop_loss: stopLoss || null
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Strategy updated successfully!', 'success');
+            
+            // Close modal
+            const modal = document.getElementById('editStrategyModal');
+            const bootstrapModal = bootstrap.Modal.getInstance(modal);
+            bootstrapModal.hide();
+            
+            // Reload page to show updated values
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        } else {
+            showNotification('Failed to update strategy: ' + data.error, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error updating strategy:', error);
+        showNotification('Error updating strategy', 'error');
+    });
+}
+
+function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} alert-dismissible fade show`;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        min-width: 300px;
+    `;
+
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+
+    // Add to page
+    document.body.appendChild(notification);
+
+    // Remove after 3 seconds
+    setTimeout(() => {
+        if (notification.parentElement) {
+            notification.remove();
+        }
+    }, 3000);
 }
 </script>
 {% endblock %}
